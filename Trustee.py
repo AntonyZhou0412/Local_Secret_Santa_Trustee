@@ -182,9 +182,11 @@ def main() -> None:
     assignments = gen_derangement(names)
     write_tmp_assign(assignments)
 
-    # Build case-insensitive lookup
-    lc_to_name = {n.lower(): n for n in names}
-    viewed: Set[str] = set()
+    # Build case-insensitive lookup that preserves duplicates differing only by case
+    lc_to_names: Dict[str, List[str]] = {}
+    for original in names:
+        lc_to_names.setdefault(original.lower(), []).append(original)
+    viewed: set[str] = set()
 
     clear_screen_and_scrollback()
     print("Assignments generated. Private reveal mode started.")
@@ -202,11 +204,52 @@ def main() -> None:
                 return
 
             key = query.lower()
-            if key not in lc_to_name:
+            if key not in lc_to_names:
                 print("Name not found. Please re-check spelling and try again.")
                 continue
 
-            real_name = lc_to_name[key]
+            candidates = lc_to_names[key]
+            real_name: str | None = None
+
+            if query in candidates:
+                real_name = query
+            elif len(candidates) == 1:
+                real_name = candidates[0]
+            else:
+                print("Multiple participants match that entry:")
+                for idx, candidate in enumerate(candidates, start=1):
+                    print(f"  {idx}. {candidate}")
+
+                while True:
+                    selection = input(
+                        "Enter the number or exact name (or type 'cancel' to abort): "
+                    ).strip()
+
+                    if not selection:
+                        print("Please enter a selection.")
+                        continue
+
+                    if selection.lower() in {"cancel", "abort", "back"}:
+                        print("Selection canceled. Returning to main prompt.")
+                        break
+
+                    if selection.isdigit():
+                        idx = int(selection)
+                        if 1 <= idx <= len(candidates):
+                            real_name = candidates[idx - 1]
+                            break
+                        print("Number out of range. Try again.")
+                        continue
+
+                    if selection in candidates:
+                        real_name = selection
+                        break
+
+                    print("Input did not match any option. Try again.")
+
+                if real_name is None:
+                    continue
+
             if one_shot_reveal and real_name in viewed:
                 print("You have already viewed your assignment.")
                 continue
