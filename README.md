@@ -1,112 +1,147 @@
-# 🕯️ Secret Santa Trustee — Encrypted Edition  
-*Merry Christmas and keep your secrets safe!* 🎁
 
-A simple, privacy-first Secret Santa helper for small groups — now with **optional encrypted backup** support.  
-Every participant privately learns their recipient; the organizer can optionally generate an **AES-encrypted ZIP** containing all assignments, where **each person holds one piece of the password**.
+# Secret Santa Trustee — Encrypted Edition
 
----
+A privacy-first Secret Santa helper for small groups, with an optional AES-encrypted backup of assignments.  
+Each participant privately looks up their recipient; no one else’s assignment is shown.
 
-## ✨ Highlights
-
-- **Private reveal:** each participant only sees their own recipient.  
-- **Encrypted backup (optional):** creates an AES-256 ZIP file; password is split across participants.  
-- **Screen + scrollback clearing:** prevents snooping in terminal history.  
-- **Temporary files only:** all intermediate data deleted on exit.  
-- **Cross-platform:** works on Windows / macOS / Linux (Python 3.8+).  
-- **Interactive or CLI-driven:** choose settings from a menu or command-line flags.
+- Python 3.8+
+- Cross-platform: Windows / macOS / Linux
+- No network access required
 
 ---
 
-## 🎮 Quick Start
+## Table of Contents
+- [Features](#features)
+- [Requirements](#requirements)
+- [Install](#install)
+- [Quick Start (Interactive Menu)](#quick-start-interactive-menu)
+- [Command-Line Usage](#command-line-usage)
+  - [Options](#options)
+  - [Examples](#examples)
+- [Encrypted Backup](#encrypted-backup)
+- [How the Reveal Flow Works](#how-the-reveal-flow-works)
+- [Privacy & Data Handling](#privacy--data-handling)
+- [Troubleshooting](#troubleshooting)
+- [Notes on Terminals](#notes-on-terminals)
+- [License](#license)
 
-1. **Install dependencies**
-   ```bash
-   pip install pyzipper
-Run the program
+---
 
-bash
-Copy code
+## Features
+- **Private reveal**: each participant sees only their own recipient.
+- **Derangement**: nobody gifts to themselves.
+- **Optional encrypted backup**: creates an AES ZIP archive of assignments; the password is split into per-person segments.
+- **Clear screen and scrollback** after each reveal to reduce shoulder-surfing.
+- **Temporary files only**: created in the OS temp directory and deleted on exit.
+- **Interactive menu** or **command-line flags**; deterministic runs via `--seed`.
+
+---
+
+## Requirements
+- Python ≥ 3.8
+- Package: `pyzipper` (for encrypted backup)
+
+> If you do not enable encrypted backup, the script still runs without network or external services.
+
+---
+
+## Install
+```bash
+pip install pyzipper
+````
+
+> You may wish to use a virtual environment: `python -m venv .venv && source .venv/bin/activate` (PowerShell: `.venv\Scripts\Activate`).
+
+---
+
+## Quick Start (Interactive Menu)
+
+Run with an on-screen configuration menu:
+
+```bash
 python3 "Trustee Encrypted V2.py"
-Follow the on-screen menu
-Choose between:
+```
 
-Manual mode (press Enter to clear)
+The menu lets you choose:
 
-Auto-clear after N seconds
+* **Screen clearing**: manual (press Enter) or auto-clear after N seconds.
+* **Encrypted backup**: enable/disable.
 
-Enable or disable encrypted backup
+---
 
-⚙️ Command-Line Options
-Skip the configuration menu and control behavior directly:
+## Command-Line Usage
 
-Option	Description
---timeout N	Auto-clear after N seconds
---no-enter	Instant clear (no wait, no Enter)
---allow-repeat	Allow repeat viewing of results
---seed INT	Deterministic assignment generation
---no-backup	Disable encrypted backup
---skip-menu	Bypass the setup menu entirely
+You can bypass the menu and control behavior via flags:
 
-Example:
+```bash
+python3 "Trustee Encrypted V2.py" [OPTIONS]
+```
 
-bash
-Copy code
-python3 "Trustee Encrypted V2.py" --timeout 5 --seed 42 --no-backup
-🔐 Encrypted Backup Details
-When encryption is enabled:
+### Options
 
-Creates a ZIP archive
+| Option           | Type / Values   | Effect                                                                            |
+| ---------------- | --------------- | --------------------------------------------------------------------------------- |
+| `--timeout N`    | integer `N ≥ 0` | Auto-clear after N seconds. (`0` = clear immediately.)                            |
+| `--no-enter`     | flag            | Clear immediately after showing the recipient (same as `--timeout 0`).            |
+| `--allow-repeat` | flag            | Allow a participant to view their assignment multiple times. Default is one-shot. |
+| `--seed INT`     | integer         | Use a fixed PRNG seed for deterministic assignments.                              |
+| `--no-backup`    | flag            | Disable encrypted ZIP backup.                                                     |
+| `--skip-menu`    | flag            | Skip the interactive menu and only use the above flags/defaults.                  |
 
-python
-Copy code
-secret_santa_YYYYMMDD_HHMMSS.zip
-in the same directory as the script.
+### Examples
 
-Generates a random numeric password (4 digits × number of participants).
-
-Each participant receives one password segment:
-
-csharp
-Copy code
-[Part i] XXXX
-Combine all parts in order to reconstruct the full password and unlock the archive.
-
-Compatible with standard AES ZIP tools like 7-Zip or WinRAR.
-
-🧭 Reveal Flow
-Organizer enters all participant names (comma-separated).
-
-Program builds a derangement (no self-gifting).
-
-Each participant types their name to see their recipient.
-
-Screen clears automatically or after pressing Enter.
-
-Temporary files are removed on exit for complete privacy.
-
-💡 Example Commands
-bash
-Copy code
-# Default: manual Enter mode
+```bash
+# Default (interactive menu; manual clear by Enter)
 python3 "Trustee Encrypted V2.py"
 
-# 5-second auto-clear
-python3 "Trustee Encrypted V2.py" --timeout 5
+# Auto-clear after 5 seconds
+python3 "Trustee Encrypted V2.py" --timeout 5 --skip-menu
 
-# Instant clear + deterministic seed
-python3 "Trustee Encrypted V2.py" --no-enter --seed 123
+# Instant clear + deterministic pairings
+python3 "Trustee Encrypted V2.py" --no-enter --seed 123 --skip-menu
 
-# Disable backup and skip menu
+# Disable backup and keep manual Enter mode
 python3 "Trustee Encrypted V2.py" --no-backup --skip-menu
-🧹 Notes
-Works best in a real terminal (some GUI shells may not clear scrollback).
+```
 
-All temporary files are stored in the OS temp directory and deleted automatically.
+---
 
-No internet or external storage required — 100 % local and private.
+## Encrypted Backup
 
+When enabled, the program creates:
 
+```
+secret_santa_YYYYMMDD_HHMMSS.zip
+```
 
-🎅 Credits
-Developed with care to make your Secret Santa draws private, fair, and fun.
-Wishing you a warm and joyful holiday season! 🎄
+in the script directory. It generates a numeric password whose length is **4 × (number of participants)** and splits it into equal **per-person segments**:
+
+```
+[Part 1] 1234
+[Part 2] 5678
+...
+```
+
+To decrypt the ZIP, concatenate all segments **in order** to reconstruct the full password.
+The ZIP uses AES encryption and is compatible with tools such as 7-Zip and WinRAR.
+
+---
+
+## How the Reveal Flow Works
+
+1. Organizer inputs all participant names (comma-separated).
+2. The program builds a **derangement** (no self-assignment).
+3. Each participant types their name (case-insensitive) to view their recipient.
+4. After viewing, the screen (and scrollback, if supported) is cleared.
+5. Temporary files are removed on exit.
+
+If multiple participants differ only by case (e.g., `alice`, `Alice`), the script will prompt for disambiguation.
+
+---
+
+## Privacy & Data Handling
+
+* Assignments are stored in a temporary JSON file in the OS temp directory and removed on exit.
+* If encrypted backup is **disabled**, no persistent copy is written.
+* If encrypted backup is **enabled**, a single AES ZIP is written; each participant receives a password segment on their reveal screen.
+* The program does **not** access the network or external services.
