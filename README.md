@@ -1,114 +1,112 @@
-# Local_Secret_Santa_Trustee
-Merry Christmas!!!!
+# 🕯️ Secret Santa Trustee — Encrypted Edition  
+*Merry Christmas and keep your secrets safe!* 🎁
 
-# Secret Santa Trustee
-
-A simple, privacy-first Secret Santa helper for small groups.
-
-The organizer enters a list of names, and each participant privately learns their recipient by typing their own name. The program generates a **derangement** (nobody gifts to themselves), shows only the relevant match, and clears the screen so the next person cannot see any previous results. A temporary assignment file is created and deleted automatically when the session ends.
+A simple, privacy-first Secret Santa helper for small groups — now with **optional encrypted backup** support.  
+Every participant privately learns their recipient; the organizer can optionally generate an **AES-encrypted ZIP** containing all assignments, where **each person holds one piece of the password**.
 
 ---
 
-## 🎄 Features
+## ✨ Highlights
 
-- **Private reveal:** only one person’s assignment is ever shown.
-- **Screen + scrollback clearing:** prevents snooping.
-- **No persistent data:** temporary file auto-deleted on exit.
-- **Case-insensitive lookup** for convenience.
-- **Optional one-shot viewing** (default): each person may see only once.
-- **Configurable via CLI flags.**
-
----
-
-## 🧭 Default Mode (Enter-to-Clear)
-
-By default, the program runs in **manual mode**:
-
-- Each participant types their name to see their gift recipient.
-- After viewing, the program displays:
-  > (Press Enter to clear, and pass to next person)
-- When the participant presses **Enter**, the screen and scrollback are cleared.
-
-This ensures maximum privacy for small, in-person groups.
-
-To run the program in this default mode:
-
-```bash
-python3 Trustee.py
-```
+- **Private reveal:** each participant only sees their own recipient.  
+- **Encrypted backup (optional):** creates an AES-256 ZIP file; password is split across participants.  
+- **Screen + scrollback clearing:** prevents snooping in terminal history.  
+- **Temporary files only:** all intermediate data deleted on exit.  
+- **Cross-platform:** works on Windows / macOS / Linux (Python 3.8+).  
+- **Interactive or CLI-driven:** choose settings from a menu or command-line flags.
 
 ---
 
-## ⚙️ Other Modes & Options
+## 🎮 Quick Start
 
-You can customize the reveal and clearing behavior using command-line flags.
+1. **Install dependencies**
+   ```bash
+   pip install pyzipper
+Run the program
 
-### Auto-Clear Mode
-Automatically clears after a fixed delay.
+bash
+Copy code
+python3 "Trustee Encrypted V2.py"
+Follow the on-screen menu
+Choose between:
 
-```bash
-python3 Trustee.py --timeout 5
-```
-This means the message will be automatically erased after **5 seconds**. The program displays:
-> (This message will be automatically cleared in 5 seconds. Please pass the device to the next person afterward.)
+Manual mode (press Enter to clear)
 
-### Instant-Clear Mode
-Immediately clears after showing the recipient (no waiting, no Enter press):
+Auto-clear after N seconds
 
-```bash
-python3 Trustee.py --no-enter
-```
-Displays:
-> (Clearing now. Please pass the device to the next person.)
+Enable or disable encrypted backup
 
-### Allow Repeat Viewing
-By default, each participant can view their result **only once**. To allow multiple reveals per person:
+⚙️ Command-Line Options
+Skip the configuration menu and control behavior directly:
 
-```bash
-python3 Trustee.py --allow-repeat
-```
+Option	Description
+--timeout N	Auto-clear after N seconds
+--no-enter	Instant clear (no wait, no Enter)
+--allow-repeat	Allow repeat viewing of results
+--seed INT	Deterministic assignment generation
+--no-backup	Disable encrypted backup
+--skip-menu	Bypass the setup menu entirely
 
-### Reproducible Results (Seed)
-You can provide a seed for deterministic pairings:
+Example:
 
-```bash
-python3 Trustee.py --seed 123
-```
-This ensures the same name list always produces the same assignments.
+bash
+Copy code
+python3 "Trustee Encrypted V2.py" --timeout 5 --seed 42 --no-backup
+🔐 Encrypted Backup Details
+When encryption is enabled:
 
----
+Creates a ZIP archive
 
-## 💡 Example Commands
+python
+Copy code
+secret_santa_YYYYMMDD_HHMMSS.zip
+in the same directory as the script.
 
-```bash
-# Default: manual enter mode
-python3 Trustee.py
+Generates a random numeric password (4 digits × number of participants).
+
+Each participant receives one password segment:
+
+csharp
+Copy code
+[Part i] XXXX
+Combine all parts in order to reconstruct the full password and unlock the archive.
+
+Compatible with standard AES ZIP tools like 7-Zip or WinRAR.
+
+🧭 Reveal Flow
+Organizer enters all participant names (comma-separated).
+
+Program builds a derangement (no self-gifting).
+
+Each participant types their name to see their recipient.
+
+Screen clears automatically or after pressing Enter.
+
+Temporary files are removed on exit for complete privacy.
+
+💡 Example Commands
+bash
+Copy code
+# Default: manual Enter mode
+python3 "Trustee Encrypted V2.py"
 
 # 5-second auto-clear
-python3 Trustee.py --timeout 5
+python3 "Trustee Encrypted V2.py" --timeout 5
 
-# Instant clear (no waiting)
-python3 Trustee.py --no-enter
+# Instant clear + deterministic seed
+python3 "Trustee Encrypted V2.py" --no-enter --seed 123
 
-# Allow repeat viewing
-python3 Trustee.py --allow-repeat
+# Disable backup and skip menu
+python3 "Trustee Encrypted V2.py" --no-backup --skip-menu
+🧹 Notes
+Works best in a real terminal (some GUI shells may not clear scrollback).
 
-# Combine options
-python3 Trustee.py --timeout 3 --allow-repeat --seed 42
-```
+All temporary files are stored in the OS temp directory and deleted automatically.
 
----
+No internet or external storage required — 100 % local and private.
 
-## 🧹 Notes
 
-- Temporary assignment file is deleted automatically on exit.
-- Works on Windows, macOS, and Linux.
-- The program clears both the **screen** and the **scrollback buffer**, but some terminals may not fully support the latter.
 
----
-
-## 🎅 Credits
-
-Developed with care to make your Secret Santa draws private, fun, and stress-free!
-
-Happy holidays and enjoy your Secret Santa! 🎁
+🎅 Credits
+Developed with care to make your Secret Santa draws private, fair, and fun.
+Wishing you a warm and joyful holiday season! 🎄
